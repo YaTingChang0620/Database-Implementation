@@ -1,0 +1,65 @@
+update Employee
+set Hire_date = DATE '2016-03-05'
+Where Emp_Num = '513'
+
+INSERT INTO Training(Train_Num, Code, Emp_Num,Date_Acquired,Name, Comments)
+       VALUES ('1033', '0001', '513', DATE'2016-05-11', 'Introduction to Python', 'For 1st Grade');
+
+DELETE FROM Assignment
+WHERE Assign_Num = 'HC1172'
+
+update Training 
+set date_acquired = DATE '2017-05-01'
+Where Train_Num = '1005'
+
+update Employee
+set Hire_date = DATE '2016-03-04'
+Where Emp_Num = '505'
+
+INSERT INTO Training(Train_Num, Code, Emp_Num,Date_Acquired,Name, Comments)
+       VALUES ('1034', '0006', '513', DATE '2017-01-01', 'Introduction to SAS', 'For 1st Grade');
+
+
+INSERT INTO Training(Train_Num, Code, Emp_Num,Date_Acquired,Name, Comments)
+       VALUES ('1035', '0004', '513', DATE '2016-10-23', 'Introduction to JAVA', 'For 1st Grade');
+
+update Employee
+set Hire_date = DATE '2016-08-12'
+Where Emp_Num = '508'
+
+update Training 
+set date_acquired = DATE '2016-08-31'
+Where Train_Num = '1008'
+
+
+INSERT INTO Training(Train_Num, Code, Emp_Num,Date_Acquired,Name, Comments)
+       VALUES ('1036', '0002', '508', DATE '2017-01-21', 'Upper Level of R', 'For 2nd Grade');
+
+
+
+INSERT INTO Assignment(Assign_Num,Proj_Number,Emp_Num,Date_Assigned,Date_Ended,Hours_Used)
+       VALUES('HC1172','H5490','508','06-SEP-2017','30-SEP-2017',32);
+INSERT INTO Assignment(Assign_Num,Proj_Number,Emp_Num,Date_Assigned,Date_Ended,Hours_Used)
+       VALUES('HC1170','H5490','508','01-OCT-2017','31-OCT-2017',10);
+INSERT INTO Assignment(Assign_Num,Proj_Number,Emp_Num,Date_Assigned,Date_Ended,Hours_Used)
+       VALUES('HC1171','H5490','508','01-NOV-2017',NULL,NULL);
+
+
+       
+INSERT INTO Assignment VALUES('HC1172','H5490','508','06-SEP-2017','30-SEP-2017',32);
+INSERT INTO Assignment VALUES('HC1170','H5490','508','01-OCT-2017','31-OCT-2017',10);
+INSERT INTO Assignment VALUES('HC1171','H5490','508','01-NOV-2017',NULL,NULL);
+
+
+update Project
+set start_date = DATE '2017-11-06'
+Where Proj_Number = 'H8877'
+
+
+update Assignment
+set Hours_Used = 40
+Where Assign_Num = 'HC1175'
+
+update Assignment
+set Hours_Used = 21
+Where Assign_Num = 'HC1176'
