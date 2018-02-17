@@ -16,5 +16,16 @@ Homer Consulting maintains a list of desired skills. Each employee may take the 
 * Generate report   
 
 ##### Schema: 
-![Alt text](https://github.com/YaTingChang0620/Database-Implementation/blob/master/schema.PNG)
-
+| **SKILL** (Code, Description)
+|--------------------------------------------------------------------------------------------------------
+| **TRAINING** (Train_Num, Code@, Emp_Num@, Date_Acquired, Name, Comments)
+|--------------------------------------------------------------------------------------------------------
+| **DEPARTMENT** (Dept_Code, Name, Location, Phone, Manager_ID@)
+|--------------------------------------------------------------------------------------------------------
+| **EMPLOYEE** (Emp_Num, Emp_Last, Emp_First, DOB, Hire_Date, Super_ID@, Dept_Code@)
+|--------------------------------------------------------------------------------------------------------
+| **CLIENT** (Client_ID, Name, Street, City, State, Zip_Code, Industry, Web_Address, Phone, Contact_Name)
+|--------------------------------------------------------------------------------------------------------
+| **PROJECT** (Proj_Number, Name, Start_Date, Total_Cost, Dept_Code@, Client_ID@)
+|--------------------------------------------------------------------------------------------------------
+| **ASSIGNMENT** (Assign_Num, Proj_Number@, Emp_Num@, Date_Assigned, Date_Ended, Hours_Used)
