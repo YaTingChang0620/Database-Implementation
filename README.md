@@ -13,7 +13,7 @@ Homer Consulting maintains a list of desired skills. Each employee may take the 
 * Create Table  
 * Insert Value  
 * Develop Query  
-* Generate report   
+* Generate Report   
 
 ##### Schema: 
 | Table    | Field   |
