@@ -1,0 +1,190 @@
+--Q1
+COLUMN "ID" FORMAT A5
+COLUMN "Employee" FORMAT A20
+COLUMN "Skill Name" FORMAT A11
+COLUMN "# Training" FORMAT A15
+COLUMN "Most Recent" FORMAT A10
+
+BREAK ON "ID" ON"Employee"
+SELECT Emp_Num "ID", Emp_Last||' '||Emp_First "Employee", NVL(Description,'NA') "Skill Name", 
+       NVL(DECODE(COUNT(Train_Num),0,NULL,COUNT(Train_Num)),0) AS "# Training",
+       NVL(TO_CHAR(MAX(Date_Acquired)),'NA') AS "Most Recent",
+       NVL(TRUNC(MONTHS_BETWEEN(SYSDATE,MAX(Date_Acquired)),0),0) AS "Months Passed"
+FROM Employee LEFT OUTER JOIN Training USING (Emp_Num)
+              LEFT OUTER JOIN Skill USING (Code)
+GROUP BY Emp_Num,Emp_Last,Emp_First,Code,description
+ORDER BY 1;
+
+
+--Q2
+COLUMN "Employee" FORMAT A40
+COLUMN "Dept_Name" FORMAT A30
+
+SELECT LEVEL,
+       LPAD(' ', 3*(LEVEL-1)) || Emp_Num || '   ' || Emp_Last || ' ' || Emp_First "Employee", Name"Dept_Name"
+FROM Employee LEFT OUTER JOIN Department USING(Dept_Code)
+START WITH Emp_Num = (SELECT Emp_Num
+                      FROM Employee
+                      WHERE Super_ID IS NULL)
+CONNECT BY PRIOR Emp_Num = Super_ID;
+
+--Q3
+COLUMN "Project #" FORMAT A13
+COLUMN "Project Name" FORMAT A30
+COLUMN "# hour" FORMAT A15
+COLUMN "Month" FORMAT A10
+
+BREAK ON "Project #" ON "Project Name" ON "Start Date" ON "Year"
+
+SELECT Proj_number"Project #",Name"Project Name",start_date"Start Date",EXTRACT(YEAR FROM Date_Assigned)"Year", 
+NVL(TO_CHAR(EXTRACT(MONTH FROM Date_Assigned)),'sub-total')"Month",COUNT(DISTINCT Emp_Num) "# Employee",NVL(TO_CHAR(SUM(Hours_Used)),'Not completed')"# hour"
+FROM Project JOIN Assignment USING (Proj_number)
+WHERE Total_Cost IS NULL
+GROUP BY GROUPING SETS(
+(Proj_number,Name,start_date,EXTRACT(YEAR FROM Date_Assigned),EXTRACT(MONTH FROM Date_Assigned)),
+(Proj_number,Name,start_date)
+)
+ORDER BY 1,4;
+
+
+--Q4
+ALTER TABLE Employee
+ADD BONUS_AMT NUMBER(6,2);
+
+UPDATE Employee e
+SET BONUS_AMT = (
+SELECT NVL(bonus,0)"Bonus"
+FROM Employee LEFT OUTER JOIN 
+(SELECT Emp_Num, 200*COUNT(DISTINCT Proj_Number)bonus
+ FROM Assignment JOIN Project USING(Proj_Number)
+ WHERE EXTRACT(YEAR FROM Start_Date) >= EXTRACT(YEAR FROM SYSDATE)-1
+      AND
+      (Emp_Num,Proj_Number) IN (SELECT Emp_Num, Proj_Number
+                                FROM Assignment JOIN Project USING(Proj_Number)
+                                GROUP BY Proj_Number, Emp_Num
+                                HAVING SUM(Hours_used) >= 40)
+ GROUP BY Emp_num
+ ORDER BY 1,2)
+USING(Emp_Num)
+WHERE e.Emp_Num = Emp_Num
+);
+
+COLUMN Emp_Num FORMAT A10
+COLUMN Emp_Last FORMAT A10
+COLUMN Emp_First FORMAT A15
+COLUMN Super_ID FORMAT A10
+
+SELECT *
+FROM Employee
+ORDER BY Emp_Num;
+
+
+--Q5
+COLUMN "Emp_Num" FORMAT A7
+COLUMN Name FORMAT A40
+COLUMN "Name" FORMAT A20
+COLUMN "Training" FORMAT A30
+
+BREAK ON "Emp_Num" ON "Name" ON "Hired Date" ON "# project"
+SELECT Emp_Num"Emp_Num", Emp_Last||' '||Emp_First"Name",Hire_Date"Hired Date",COUNT(DISTINCT Proj_Number)"# project",Name"Training",Date_acquired"Date Acquired",
+(Date_Acquired-Hire_Date)"# days"
+FROM Employee JOIN Training USING(Emp_Num)
+              LEFT OUTER JOIN Assignment USING(Emp_Num)
+WHERE EXTRACT(YEAR FROM Hire_Date) = EXTRACT(YEAR FROM SYSDATE)-1
+GROUP BY Emp_Num,Emp_Last,Emp_First,Hire_Date,Name,Date_acquired
+ORDER BY 1;
+
+
+--Q6
+SELECT NAME, START_DATE, COMPLETNESS
+FROM project join (SELECT proj_number, CASE (EXTRACT (YEAR FROM MAX(NVL(DATE_ENDED, SYSDATE))) - EXTRACT(YEAR FROM START_DATE))
+                                          WHEN 0 THEN (extract (MONTH FROM MAX(NVL(DATE_ENDED, SYSDATE))) -  extract (MONTH FROM START_DATE) + 1)
+                                          ELSE (extract (MONTH FROM MAX(NVL(DATE_ENDED, SYSDATE))) -  extract (MONTH FROM START_DATE) + 12*(EXTRACT (YEAR FROM MAX(NVL(DATE_ENDED, SYSDATE))) - EXTRACT(YEAR FROM START_DATE)))
+                                          END AS "PROJECT_LENGTH",
+                                    CASE (EXTRACT (YEAR FROM MAX(NVL(DATE_ENDED, SYSDATE))) - EXTRACT(YEAR FROM START_DATE))
+                                          WHEN 0 THEN COUNT(DISTINCT (EXTRACT(MONTH FROM NVL(DATE_ENDED, SYSDATE))))
+                                          ELSE COUNT(DISTINCT EXTRACT(MONTH FROM NVL(DATE_ENDED, SYSDATE)) || EXTRACT(YEAR FROM NVL(DATE_ENDED, SYSDATE)))
+                                          END AS "ASSIGNMENT_LENGTH",
+                                    CASE MAX(NVL(DATE_ENDED, SYSDATE))
+                                          WHEN SYSDATE THEN 'ON-GOING'
+                                          ELSE 'COMPLETED' END AS "COMPLETNESS"
+          FROM project join assignment using (proj_number)
+          GROUP BY proj_number, START_DATE)
+    using (proj_number)
+WHERE PROJECT_LENGTH != ASSIGNMENT_LENGTH;
+
+
+--Q7
+SELECT START_QUARTER, count(DISTINCT proj_number) "Number of projects", count(DISTINCT EMP_num) "Number of employee working",
+    ROUND(AVG(HOURS_USED),1) "Average hours spent"
+FROM assignment join (SELECT proj_number, CASE WHEN EXTRACT(MONTH FROM START_DATE) < 4 THEN '1st quarter'
+                                          WHEN (6 < EXTRACT(MONTH FROM START_DATE) and EXTRACT(MONTH FROM START_DATE) < 10) THEN '3rd quarter'
+                                          WHEN 9 < EXTRACT(MONTH FROM START_DATE) THEN '4th quarter'
+                                          else '2nd quarter'
+                                          END AS "START_QUARTER"
+          FROM project)
+    using (proj_number) 
+GROUP BY START_QUARTER
+ORDER BY START_QUARTER;
+
+--Q8
+SET PAGESIZE 130 LINESIZE 130
+column "Employee Name" format A20
+column "java" format 99
+column "R" format 99
+column "PTN" format 99
+column "EXL" format 99
+column "SAS" format 99
+column "PPT" format 99
+select ID, "EMPLOYEE NAME", PTN, PYTHON_DATE "Latest Acquired Date", R, r_date "Latest Acquired Date",
+    "PPT", pp_date "Latest Acquired Date", java, JAVA_date "Latest Acquired Date",
+    "EXL", EXCEL_date "Latest Acquired Date",
+      "SAS" , SAS_date "Latest Acquired Date", "# of Skills"  
+from (SELECT DECODE(emp_num, NULL, '    ', emp_num) "ID",
+    DECODE("Employee Name", NULL, 'Number of Trainings:', "Employee Name") "EMPLOYEE NAME",
+    SUM(DECODE (CODE, 0001, 1, 0)) "PTN",
+    SUM(DECODE (CODE, 0002, 1, 0)) "R",
+    SUM(DECODE (CODE, 0003, 1, 0)) "PPT",
+    SUM(DECODE (CODE, 0004, 1, 0)) "JAVA", SUM(DECODE (CODE, 0005, 1, 0)) "EXL", 
+    SUM(DECODE (CODE, 0006, 1, 0)) "SAS",   
+    COUNT(DISTINCT CODE) "# of Skills"
+FROM (SELECT EMP_FIRST ||' '|| EMP_LAST "Employee Name", EMP_NUM
+  FROM EMPLOYEE) join training using (emp_num) join skill using (code)
+GROUP BY GROUPING SETS (("Employee Name", EMP_NUM), ())) t1
+LEFT OUTER join (select emp_num, MAX(DATE_ACQUIRED) python_date
+  from training
+  where code = 0001
+  group by emp_num)t2 on (t2.emp_num = t1.ID)
+LEFT OUTER join (select emp_num, MAX(DATE_ACQUIRED) r_date
+  from training
+  where code = 0002
+  group by emp_num)t3 on (t3.emp_num = t1.ID)
+LEFT OUTER join (select emp_num, MAX(DATE_ACQUIRED) pp_date
+  from training
+  where code = 0003
+  group by emp_num)t4 on (t4.emp_num = t1.ID)
+LEFT OUTER join (select emp_num, MAX(DATE_ACQUIRED) JAVA_date
+  from training
+  where code = 0004
+  group by emp_num)t5 on (t5.emp_num = t1.ID)
+LEFT OUTER join (select emp_num, MAX(DATE_ACQUIRED) EXCEL_date
+  from training
+  where code = 0005
+  group by emp_num)t6 on (t6.emp_num = t1.ID)
+LEFT OUTER join (select emp_num, MAX(DATE_ACQUIRED) SAS_date
+  from training
+  where code = 0006
+  group by emp_num)t7 on (t7.emp_num = t1.ID)
+ORDER BY ID DESC NULLS LAST;
+
+
+-Q9
+COLUMN DEPARTMENT FORMAT A20
+COLUMN "SKILL" FORMAT A15
+COLUMN "rank" FORMAT 99
+BREAK ON "Department"
+SELECT  Department, "Skill", "Training Times", RANK () OVER (partition by department ORDER BY "Training Times" DESC) AS RANK
+from (SELECT DEPARTMENT.NAME "DEPARTMENT",DESCRIPTION "Skill",COUNT (TRAIN_NUM) "Training Times"
+  FROM DEPARTMENT JOIN EMPLOYEE USING (DEPT_CODE) JOIN Training USING(Emp_Num) JOIN SKILL USING (CODE)
+  GROUP BY DEPARTMENT.NAME, DESCRIPTION, DEPT_CODE)
+ORDER BY 1, 3 desc;

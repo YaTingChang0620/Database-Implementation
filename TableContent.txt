@@ -1,0 +1,35 @@
+COLUMN "ID" FORMAT A5
+COLUMN "Name" FORMAT A8
+COLUMN "Street" FORMAT A25
+COLUMN "City" FORMAT A15
+COLUMN "State" FORMAT A5
+COLUMN "Zip_Code" FORMAT A8
+COLUMN "Industry" FORMAT A10
+COLUMN "Website" FORMAT A18
+COLUMN "Phone" FORMAT A15
+COLUMN "Contact" FORMAT A10
+
+SELECT Client_ID"ID",Name"Name", Street "Street",CITY"City",STATE"State",ZIP_CODE"Zip_Code",Industry"Industry",WEB_ADDRESS"Website",PHONE"Phone",CONTACT_NAME"Contact"
+FROM CLIENT;
+
+---
+
+COLUMN "Project #" FORMAT A10
+COLUMN "Name" FORMAT A30
+COLUMN "Start_Date" FORMAT A12
+COLUMN "COST" FORMAT A8
+COLUMN "Dept_Code" FORMAT A9
+COLUMN "Client_ID" FORMAT A10
+
+SELECT Proj_Number"Project #",Name"Name",Start_Date"Start_Date",NVL(TO_CHAR(Total_Cost),'NA')"Cost",Dept_code"Dept_Code",Client_ID"Client_ID"
+FROM PROJECT;
+
+---
+
+COLUMN "Assign#" FORMAT A15
+COLUMN "Assigned Date" FORMAT A15
+COLUMN "Ended Date" FORMAT A15
+COLUMN "Used hours" FORMAT A10
+
+SELECT ASSIGN_NUM"Assign#",Proj_Number"Project #",Emp_Num"Emp_Num",Date_Assigned"Assigned Date",NVL(TO_CHAR(Date_ended),'NA')"Ended Date",NVL(TO_CHAR(Hours_used),'NA')"Used hours"
+FROM Assignment;
