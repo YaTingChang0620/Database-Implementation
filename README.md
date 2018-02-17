@@ -17,7 +17,7 @@ Homer Consulting maintains a list of desired skills. Each employee may take the 
 
 ##### Schema: 
 | TABLE    | Field   |
-| ---------| :------:| 
+| ---------| ------| 
 | **SKILL** | (Code, Description) |
 | **TRAINING** | (Train_Num, Code@, Emp_Num@, Date_Acquired, Name, Comments) |
 | **DEPARTMENT** | (Dept_Code, Name, Location, Phone, Manager_ID@) |
