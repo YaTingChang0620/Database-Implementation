@@ -1,7 +1,7 @@
 #### Database-Implementation
 
 ##### Project Description  
-Built a database for a consulting firm. Create SQL queries to answer client maintenance and employee training questions. 
+Built a database for a consulting firm. Create SQL queries to answer client management and employee training questions. 
 
 ##### Model Description      
 In Homer Consulting each employee is assigned to (employed by) a specific department.   
